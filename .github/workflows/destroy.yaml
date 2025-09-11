@@ -1,0 +1,40 @@
+name: Destroy EKS Cluster
+
+on:
+  workflow_dispatch:
+    inputs:
+      cluster-name:
+        description: "EKS Cluster Name"
+        required: true
+        default: "my-eks-cluster"
+      region:
+        description: "AWS Region"
+        required: true
+        default: "us-east-1"
+
+jobs:
+  destroy-cluster:
+    runs-on: ubuntu-latest
+
+    permissions:
+      id-token: write   # required for OIDC
+      contents: read    # to checkout code
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials (with OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::<ACCOUNT_ID>:role/<YOUR_ROLE_NAME>
+          aws-region: ${{ github.event.inputs.region }}
+
+      - name: Install eksctl
+        run: |
+          curl --silent --location "https://github.com/weaveworks/eksctl/releases/latest/download/eksctl_$(uname -s)_amd64.tar.gz" | tar xz -C /tmp
+          sudo mv /tmp/eksctl /usr/local/bin
+
+      - name: Destroy EKS Cluster
+        run: |
+          eksctl delete cluster --name "${{ github.event.inputs.cluster-name }}" --region "${{ github.event.inputs.region }}"

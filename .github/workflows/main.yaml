@@ -1,0 +1,11 @@
+name: CI
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  ci:
+    uses: ./.github/workflows/_ci.yaml
+    with:
+      node-version: '20'

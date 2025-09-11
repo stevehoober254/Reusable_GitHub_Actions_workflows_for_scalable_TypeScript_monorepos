@@ -1,0 +1,49 @@
+name: Reusable Deploy
+
+on:
+  workflow_call:
+    inputs:
+      environment:
+        required: true
+        type: string
+      service:
+        required: true
+        type: string
+      cluster_name:
+        required: true
+        type: string
+      region:
+        required: true
+        type: string
+      manifest-path:
+        required: true
+        type: string
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    permissions:
+      id-token: write
+      contents: read
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_DEPLOY_ROLE }}
+          aws-region: ${{ inputs.region }}
+
+      - name: Update kubeconfig
+        run: |
+          aws eks update-kubeconfig \
+            --name ${{ inputs.cluster_name }} \
+            --region ${{ inputs.region }}
+
+      - name: Deploy to Kubernetes
+        run: |
+          kubectl apply -f ${{ inputs.manifest-path }}
+          kubectl rollout status deployment/${{ inputs.service }} -n ${{ inputs.environment }}

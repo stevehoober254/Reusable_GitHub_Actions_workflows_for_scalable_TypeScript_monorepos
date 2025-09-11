@@ -1,0 +1,14 @@
+name: Deploy to Production
+
+on:
+  workflow_dispatch: # manual trigger for safety
+
+jobs:
+  deploy:
+    uses: ./.github/workflows/_deploy.yaml
+    with:
+      environment: "production"
+      service: "api"
+      cluster_name: "my-eks-cluster"
+      region: "eu-north-1"
+      manifest-path: "k8s/api-deployment.yaml"

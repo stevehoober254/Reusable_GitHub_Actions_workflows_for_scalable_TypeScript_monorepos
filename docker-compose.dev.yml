@@ -1,0 +1,50 @@
+version: '3.8'
+
+services:
+  # API Service (Development mode with hot reload)
+  api:
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+      target: builder
+    ports:
+      - "4000:4000"
+    environment:
+      - NODE_ENV=development
+      - PORT=4000
+    volumes:
+      - ./apps/api/src:/app/apps/api/src:ro
+      - ./packages:/app/packages:ro
+    command: ["pnpm", "dev"]
+    restart: unless-stopped
+    networks:
+      - app-network
+
+  # Web Service (Development mode with hot reload)
+  web:
+    build:
+      context: .
+      dockerfile: apps/web/Dockerfile
+      target: builder
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=development
+      - PORT=3000
+      - API_URL=http://api:4000
+      - WATCHPACK_POLLING=true
+    volumes:
+      - ./apps/web:/app/apps/web:ro
+      - ./packages:/app/packages:ro
+      - /app/apps/web/node_modules
+      - /app/apps/web/.next
+    command: ["pnpm", "dev"]
+    restart: unless-stopped
+    networks:
+      - app-network
+    depends_on:
+      - api
+
+networks:
+  app-network:
+    driver: bridge
