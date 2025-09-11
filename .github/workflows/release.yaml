@@ -8,7 +8,6 @@ jobs:
   release:
     uses: ./.github/workflows/_release.yaml
     with:
-      image-name: "monorepo-app"
       registry: "docker.io/stevehoober"
       environment: "production"
     secrets:
