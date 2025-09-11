@@ -3,4 +3,3 @@
 *.env
 .next
 .pnpm-store
-pnpm-lock.yaml
