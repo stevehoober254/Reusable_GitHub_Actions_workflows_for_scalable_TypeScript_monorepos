@@ -2,14 +2,14 @@ name: Release
 on:
   push:
     tags:
-      - 'v*.*.*'
+      - "v*.*.*"
 
 jobs:
   release:
     uses: ./.github/workflows/_release.yaml
     with:
       image-name: "monorepo-app"
-      registry: "docker.io/yourdockeruser"
+      registry: "docker.io/stevehoober"
       environment: "production"
     secrets:
       DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
