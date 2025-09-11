@@ -9,5 +9,5 @@ jobs:
     uses: ./.github/workflows/_release.yaml
     with:
       image-name: "monorepo-app"
-      registry: "docker.io/yourdockeruser"
+      registry: "docker.io/stevehoober"
       environment: "production"
