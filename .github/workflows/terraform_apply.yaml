@@ -1,0 +1,53 @@
+# This workflow automates the `terraform apply` process
+# to provision AWS infrastructure for the monorepo.
+
+name: "Terraform Apply EKS"
+
+on:
+  workflow_dispatch: # manual trigger for safety
+    inputs:
+      terraform_path:
+        description: "Path to terraform directory (default: terraform/)"
+        required: false
+        default: "terraform/"
+        type: string
+
+jobs:
+  terraform:
+    name: "Terraform Apply"
+    runs-on: ubuntu-latest
+    env:
+      AWS_REGION: ${{ secrets.AWS_REGION }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # Configure AWS credentials from GitHub Secrets
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_DEPLOY_ROLE }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.6.0
+
+      - name: Terraform Init
+        id: init
+        run: |
+          cd ${{ inputs.terraform_path || 'terraform/' }}
+          terraform init
+
+      - name: Terraform Plan
+        id: plan
+        run: |
+          cd ${{ inputs.terraform_path || 'terraform/' }}
+          terraform plan -no-color -out=tfplan
+
+      - name: Terraform Apply
+        run: |
+          cd ${{ inputs.terraform_path || 'terraform/' }}
+          terraform apply -auto-approve tfplan
