@@ -3,8 +3,13 @@ name: Deploy to Production
 on:
   workflow_dispatch: # manual trigger for safety
 
+permissions:
+  id-token: write      # required for OIDC with AWS
+  contents: read       # required for checkout
+  
 jobs:
-  deploy:
+  deploy-api:
+    name: Deploy API
     uses: ./.github/workflows/_deploy.yaml
     with:
       environment: "production"
@@ -12,3 +17,13 @@ jobs:
       cluster_name: "my-eks-cluster"
       region: "eu-north-1"
       manifest-path: "k8s/api-deployment.yaml"
+
+  deploy-web:
+    name: Deploy Web
+    uses: ./.github/workflows/_deploy.yaml
+    with:
+      environment: "production"
+      service: "web"
+      cluster_name: "my-eks-cluster"
+      region: "eu-north-1"
+      manifest-path: "k8s/web-deployment.yaml"
