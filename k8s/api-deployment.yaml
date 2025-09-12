@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: api
-          image: docker.io/yourdockeruser/api:${GITHUB_SHA}
+          image: docker.io/stevehoober/monorepo-api:${GITHUB_SHA}
           ports:
             - containerPort: 3000
 ---

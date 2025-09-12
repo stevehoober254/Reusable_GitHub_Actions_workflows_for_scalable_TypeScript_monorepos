@@ -1,4 +1,4 @@
-name: Reusable Release
+name: Reusable Release Workflow
 
 on:
   workflow_call:
@@ -16,48 +16,40 @@ on:
         required: true
 
 jobs:
-  release:
+  build-and-push:
     runs-on: ubuntu-latest
+
     strategy:
       matrix:
-        app:
-          - name: "api"
-            context: "."
-            dockerfile: "./apps/api/Dockerfile"
-            image: "monorepo-api"
-          - name: "web"
-            context: "."
-            dockerfile: "./apps/web/Dockerfile"
-            image: "monorepo-web"
-    steps:
-      - uses: actions/checkout@v4
+        app: [web, api]  # add more apps here if needed
 
-      - name: Log in to Docker
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Log in to Container Registry
         uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
-      - name: Set up Docker tags
-        id: tags
-        run: |
-          # Extract version from tag (remove 'v' prefix if present)
-          VERSION=${GITHUB_REF_NAME#v}
-          IMAGE_NAME="${{ inputs.registry }}/${{ matrix.app.image }}"
-          
-          # Create tags
-          echo "tags=${IMAGE_NAME}:${VERSION},${IMAGE_NAME}:latest,${IMAGE_NAME}:${GITHUB_SHA:0:7}" >> $GITHUB_OUTPUT
-          echo "version=${VERSION}" >> $GITHUB_OUTPUT
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
 
-      - name: Build and push Docker image
-        uses: docker/build-push-action@v5
-        with:
-          context: ${{ matrix.app.context }}
-          file: ${{ matrix.app.dockerfile }}
-          push: true
-          tags: ${{ steps.tags.outputs.tags }}
-          labels: |
-            org.opencontainers.image.title=${{ matrix.app.image }}
-            org.opencontainers.image.version=${{ steps.tags.outputs.version }}
-            org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository }}
-            org.opencontainers.image.revision=${{ github.sha }}
+      - name: Build & Push Docker Image
+        run: |
+          IMAGE_NAME=${{ matrix.app }}
+          DOCKER_REPO=${{ inputs.registry }}/${{ secrets.DOCKER_USERNAME }}/$IMAGE_NAME
+
+          echo "Building image for $IMAGE_NAME"
+          echo "Target registry: $DOCKER_REPO"
+          echo "Environment: ${{ inputs.environment }}"
+
+          docker build \
+            -f apps/${IMAGE_NAME}/Dockerfile \
+            -t $DOCKER_REPO:latest \
+            -t $DOCKER_REPO:${{ github.sha }} \
+            ./apps/${IMAGE_NAME}
+
+          docker push $DOCKER_REPO:latest
+          docker push $DOCKER_REPO:${{ github.sha }}

@@ -8,7 +8,7 @@ jobs:
   release:
     uses: ./.github/workflows/_release.yaml
     with:
-      registry: "docker.io/stevehoober"
+      registry: "docker.io"
       environment: "production"
     secrets:
       DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}

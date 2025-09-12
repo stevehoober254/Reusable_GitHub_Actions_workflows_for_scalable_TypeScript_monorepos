@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: web
-          image: docker.io/yourdockeruser/web:${GITHUB_SHA} # CI/CD injects SHA tag
+          image: docker.io/stevehoober/monorepo-web:${GITHUB_SHA} # CI/CD injects SHA tag
           ports:
             - containerPort: 3000
           env:
