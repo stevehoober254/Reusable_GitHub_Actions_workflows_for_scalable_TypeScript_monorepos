@@ -21,7 +21,7 @@ jobs:
 
     strategy:
       matrix:
-        app: [web, api]  # add more apps here if needed
+        app: [web, api] # add more apps here if needed
 
     steps:
       - name: Checkout repository
@@ -45,11 +45,13 @@ jobs:
           echo "Target registry: $DOCKER_REPO"
           echo "Environment: ${{ inputs.environment }}"
 
-          docker build \
-            -f apps/${IMAGE_NAME}/Dockerfile \
-            -t $DOCKER_REPO:latest \
-            -t $DOCKER_REPO:${{ github.sha }} \
-            ./apps/${IMAGE_NAME}
+          docker buildx build \
+            --platform linux/amd64 \
+            -f ./apps/${IMAGE_NAME}/Dockerfile \
+            -t ${DOCKER_REPO}/${IMAGE_NAME}:latest \
+            -t ${DOCKER_REPO}/${IMAGE_NAME}:${{ github.sha }} \
+            --push \
+            .
 
-          docker push $DOCKER_REPO:latest
-          docker push $DOCKER_REPO:${{ github.sha }}
+          docker push $DOCKER_REPO/${IMAGE_NAME}:latest
+          docker push $DOCKER_REPO/${IMAGE_NAME}:${{ github.sha }}
