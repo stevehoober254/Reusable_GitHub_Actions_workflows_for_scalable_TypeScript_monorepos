@@ -6,7 +6,7 @@ on:
 permissions:
   id-token: write      # required for OIDC with AWS
   contents: read       # required for checkout
-  
+
 jobs:
   deploy-api:
     name: Deploy API
@@ -17,6 +17,8 @@ jobs:
       cluster_name: "my-eks-cluster"
       region: "eu-north-1"
       manifest-path: "k8s/api-deployment.yaml"
+    secrets:
+        AWS_DEPLOY_ROLE: ${{ secrets.AWS_DEPLOY_ROLE }}
 
   deploy-web:
     name: Deploy Web
@@ -27,3 +29,5 @@ jobs:
       cluster_name: "my-eks-cluster"
       region: "eu-north-1"
       manifest-path: "k8s/web-deployment.yaml"
+    secrets:
+        AWS_DEPLOY_ROLE: ${{ secrets.AWS_DEPLOY_ROLE }}

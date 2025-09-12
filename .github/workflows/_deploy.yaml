@@ -18,6 +18,9 @@ on:
       manifest-path:
         required: true
         type: string
+    secrets:
+      AWS_DEPLOY_ROLE:
+        required: true
 
 jobs:
   deploy:
