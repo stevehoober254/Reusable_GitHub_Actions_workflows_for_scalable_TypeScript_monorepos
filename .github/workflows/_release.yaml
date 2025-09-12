@@ -39,7 +39,7 @@ jobs:
       - name: Build & Push Docker Image
         run: |
           IMAGE_NAME=${{ matrix.app }}
-          DOCKER_REPO=${{ inputs.registry }}/${{ secrets.DOCKER_USERNAME }}/$IMAGE_NAME
+          DOCKER_REPO=${{ inputs.registry }}/${{ secrets.DOCKER_USERNAME }}
 
           echo "Building image for $IMAGE_NAME"
           echo "Target registry: $DOCKER_REPO"
