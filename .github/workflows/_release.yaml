@@ -53,5 +53,3 @@ jobs:
             --push \
             .
 
-          docker push $DOCKER_REPO/${IMAGE_NAME}:latest
-          docker push $DOCKER_REPO/${IMAGE_NAME}:${{ github.sha }}
