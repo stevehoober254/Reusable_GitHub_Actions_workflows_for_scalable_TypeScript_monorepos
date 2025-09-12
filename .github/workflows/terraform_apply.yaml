@@ -12,6 +12,10 @@ on:
         default: "terraform/"
         type: string
 
+permissions:
+  id-token: write # required for OIDC with AWS
+  contents: read # required for checkout
+
 jobs:
   terraform:
     name: "Terraform Apply"
