@@ -32,6 +32,9 @@ COPY . .
 # Set the working directory to the web app
 WORKDIR /app/apps/web
 
+# Install dependencies
+RUN pnpm install --frozen-lockfile
+
 # Build the Next.js application
 RUN pnpm build
 
