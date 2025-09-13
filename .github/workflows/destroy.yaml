@@ -10,15 +10,19 @@ on:
       region:
         description: "AWS Region"
         required: true
-        default: "us-east-1"
+        default: "us-north-1"
+
+permissions:
+  id-token: write # required for OIDC with AWS
+  contents: read # required for checkout
 
 jobs:
   destroy-cluster:
     runs-on: ubuntu-latest
 
     permissions:
-      id-token: write   # required for OIDC
-      contents: read    # to checkout code
+      id-token: write # required for OIDC
+      contents: read # to checkout code
 
     steps:
       - name: Checkout repository
