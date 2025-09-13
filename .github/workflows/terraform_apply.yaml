@@ -50,6 +50,15 @@ jobs:
         run: |
           cd ${{ inputs.terraform_path || 'terraform/' }}
           terraform plan -no-color -out=tfplan
+          
+      # This is the step to handle "already exists" errors
+      - name: Import existing resources
+        # You can use a conditional if you only need to run this for a single time
+        # if: always()
+        run: |
+          terraform import aws_ecr_repository.api_repo my-eks-cluster-api
+          terraform import aws_ecr_repository.nextjs_repo my-eks-cluster-nextjs
+          terraform import 'module.eks.aws_cloudwatch_log_group.this[0]' /aws/eks/my-eks-cluster/cluster
 
       - name: Terraform Apply
         run: |
